@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import static org.objectweb.asm.Opcodes.DUP;
+
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
@@ -89,13 +91,17 @@ class ProbeInserter extends MethodAdapter implements IProbeInserter {
 		// Stack[1]: I
 		// Stack[0]: [Z
 
+		mv.visitTypeInsn(Opcodes.NEW, "org/jacoco/core/data/LineData");
+		mv.visitInsn(DUP);
 		mv.visitInsn(Opcodes.ICONST_1);
+		mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				"org/jacoco/core/data/LineData", "<init>", "(S)V");
 
 		// Stack[2]: I
 		// Stack[1]: I
 		// Stack[0]: [Z
 
-		mv.visitInsn(Opcodes.BASTORE);
+		mv.visitInsn(Opcodes.AASTORE);
 	}
 
 	private void checkLoad() {
@@ -214,7 +220,7 @@ class ProbeInserter extends MethodAdapter implements IProbeInserter {
 		// original stack size depending on the probe locations. The accessor
 		// stack size is an absolute maximum, as the accessor code is inserted
 		// at the very beginning of each method when the stack size is empty.
-		final int increasedStack = Math.max(maxStack + 3, accessorStackSize);
+		final int increasedStack = Math.max(maxStack + 5, accessorStackSize);
 		mv.visitMaxs(increasedStack, maxLocals + 1);
 	}
 

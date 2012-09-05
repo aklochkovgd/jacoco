@@ -143,7 +143,19 @@ public class ExecutionDataReader {
 		}
 		final long id = in.readLong();
 		final String name = in.readUTF();
-		final boolean[] data = in.readBooleanArray();
+		final int len = in.readVarInt();
+		final LineData[] data = new LineData[len];
+		for (int i = 0; i < len; i++) {
+			final int sz = in.readVarInt();
+			if (sz > 0) {
+				final short[] tests = new short[sz];
+				for (int j = 0; j < sz; j++) {
+					tests[j] = (short) in.readVarInt();
+				}
+				data[i] = new LineData(tests);
+			}
+		}
+
 		executionDataVisitor.visitClassExecution(new ExecutionData(id, name,
 				data));
 	}

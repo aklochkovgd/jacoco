@@ -22,6 +22,7 @@ import org.jacoco.core.analysis.IClassCoverage;
 import org.jacoco.core.analysis.ICounter;
 import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.data.ExecutionDataStore;
+import org.jacoco.core.data.LineData;
 import org.jacoco.core.instr.Instrumenter;
 import org.jacoco.core.internal.analysis.CounterImpl;
 import org.jacoco.core.runtime.IRuntime;
@@ -245,6 +246,17 @@ public class CyclomaticComplexityTest {
 		target.test(2);
 		final ICounter complexity = analyze();
 		assertEquals(CounterImpl.getInstance(0, 3), complexity);
+	}
+
+	public static class Test1 {
+		private static LineData[] $jacocoData;
+
+		public void test(int i) {
+		}
+
+		public static LineData[] $jacocoInit() {
+			return null;
+		};
 	}
 
 	private void instrument(final Class<? extends Target> clazz)

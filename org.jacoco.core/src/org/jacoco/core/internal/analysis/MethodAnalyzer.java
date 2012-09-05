@@ -17,6 +17,7 @@ import java.util.List;
 import org.jacoco.core.analysis.ICounter;
 import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.analysis.ISourceNode;
+import org.jacoco.core.data.LineData;
 import org.jacoco.core.internal.flow.IMethodProbesVisitor;
 import org.jacoco.core.internal.flow.Instruction;
 import org.jacoco.core.internal.flow.LabelInfo;
@@ -30,7 +31,7 @@ import org.objectweb.asm.Label;
  */
 public class MethodAnalyzer implements IMethodProbesVisitor {
 
-	private final boolean[] executionData;
+	private final LineData[] executionData;
 
 	private final MethodCoverageImpl coverage;
 
@@ -70,7 +71,7 @@ public class MethodAnalyzer implements IMethodProbesVisitor {
 	 *            <code>null</code> if the class is not executed at all
 	 */
 	public MethodAnalyzer(final String name, final String desc,
-			final String signature, final boolean[] executionData) {
+			final String signature, final LineData[] executionData) {
 		this.executionData = executionData;
 		this.coverage = new MethodCoverageImpl(name, desc, signature);
 	}
@@ -303,7 +304,7 @@ public class MethodAnalyzer implements IMethodProbesVisitor {
 
 	private void addProbe(final int probeId) {
 		lastInsn.addBranch();
-		if (executionData != null && executionData[probeId]) {
+		if (executionData != null && executionData[probeId] != null) {
 			coveredProbes.add(lastInsn);
 		}
 	}

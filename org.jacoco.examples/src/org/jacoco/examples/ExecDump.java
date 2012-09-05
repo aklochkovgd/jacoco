@@ -19,6 +19,7 @@ import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.data.ExecutionDataReader;
 import org.jacoco.core.data.IExecutionDataVisitor;
 import org.jacoco.core.data.ISessionInfoVisitor;
+import org.jacoco.core.data.LineData;
 import org.jacoco.core.data.SessionInfo;
 
 /**
@@ -66,11 +67,11 @@ public final class ExecDump {
 		System.out.println();
 	}
 
-	private static int getHitCount(final boolean[] data) {
+	private static int getHitCount(final LineData[] data) {
 		int count = 0;
-		for (final boolean hit : data) {
-			if (hit) {
-				count++;
+		for (final LineData ld : data) {
+			if (ld != null) {
+				count += ld.getSize();
 			}
 		}
 		return count;

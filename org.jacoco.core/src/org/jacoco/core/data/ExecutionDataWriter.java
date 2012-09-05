@@ -24,7 +24,7 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 		IExecutionDataVisitor {
 
 	/** File format version, will be incremented for each incompatible change. */
-	public static final char FORMAT_VERSION = 0x1006;
+	public static final char FORMAT_VERSION = 0x1007;
 
 	/** Magic number in header for file format identification. */
 	public static final char MAGIC_NUMBER = 0xC0C0;
@@ -92,7 +92,21 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 			out.writeByte(BLOCK_EXECUTIONDATA);
 			out.writeLong(data.getId());
 			out.writeUTF(data.getName());
-			out.writeBooleanArray(data.getData());
+			final LineData[] d = data.getData();
+			out.writeVarInt(d.length);
+			for (int i = 0; i < d.length; i++) {
+				final LineData l = d[i];
+				if (l == null) {
+					out.writeVarInt(0);
+				} else {
+					final short[] tests = l.getTests();
+					final int size = l.getSize();
+					out.writeVarInt(size);
+					for (int j = 0; j < size; j++) {
+						out.writeVarInt(tests[j]);
+					}
+				}
+			}
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}

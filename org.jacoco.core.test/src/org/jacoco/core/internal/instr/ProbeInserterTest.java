@@ -61,8 +61,12 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 0);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, "org/jacoco/core/data/LineData");
+		expected.visitInsn(Opcodes.DUP);
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				"org/jacoco/core/data/LineData", "<init>", "(S)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -73,8 +77,12 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 1);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, "org/jacoco/core/data/LineData");
+		expected.visitInsn(Opcodes.DUP);
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				"org/jacoco/core/data/LineData", "<init>", "(S)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -86,8 +94,12 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 4);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, "org/jacoco/core/data/LineData");
+		expected.visitInsn(Opcodes.DUP);
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				"org/jacoco/core/data/LineData", "<init>", "(S)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -98,8 +110,12 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 5);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, "org/jacoco/core/data/LineData");
+		expected.visitInsn(Opcodes.DUP);
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				"org/jacoco/core/data/LineData", "<init>", "(S)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -308,7 +324,7 @@ public class ProbeInserterTest {
 
 		expected.visitLdcInsn("init");
 		expected.visitInsn(Opcodes.NOP);
-		expected.visitMaxs(13, 9);
+		expected.visitMaxs(15, 9);
 	}
 
 	@Test
@@ -330,7 +346,8 @@ public class ProbeInserterTest {
 
 		// Starting from the second frame on the probe variable is inserted:
 		expected.visitFrame(Opcodes.F_NEW, 4, new Object[] { "Foo",
-				Opcodes.LONG, "[Z", "java/lang/String" }, 0, new Object[0]);
+				Opcodes.LONG, "[Lorg/jacoco/core/data/LineData;",
+				"java/lang/String" }, 0, new Object[0]);
 	}
 
 	@Test
@@ -357,7 +374,8 @@ public class ProbeInserterTest {
 
 		// The locals in this frame are filled with TOP up to the probe variable
 		expected.visitFrame(Opcodes.F_NEW, 3, new Object[] { Opcodes.TOP,
-				Opcodes.TOP, "[Z", }, 1, new Object[] { "java/lang/Throwable" });
+				Opcodes.TOP, "[Lorg/jacoco/core/data/LineData;", }, 1,
+				new Object[] { "java/lang/Throwable" });
 		expected.visitInsn(Opcodes.NOP);
 		expected.visitInsn(Opcodes.NOP);
 		expected.visitInsn(Opcodes.ATHROW);

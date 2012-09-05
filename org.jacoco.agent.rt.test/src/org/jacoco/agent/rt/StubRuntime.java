@@ -12,10 +12,11 @@
 package org.jacoco.agent.rt;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 
+import org.jacoco.core.data.LineData;
 import org.jacoco.core.runtime.AbstractRuntime;
 import org.jacoco.core.runtime.IRuntime;
 import org.objectweb.asm.MethodVisitor;
@@ -49,14 +50,14 @@ public class StubRuntime extends AbstractRuntime {
 	}
 
 	public void fillProbes() {
-		final boolean[] data = store.get(0x12345678).getData();
-		Arrays.fill(data, true);
+		final LineData[] data = store.get(0x12345678).getData();
+		Arrays.fill(data, new LineData((short) 1));
 	}
 
 	public void assertNoProbes() {
-		final boolean[] data = store.get(0x12345678).getData();
-		assertFalse(data[0]);
-		assertFalse(data[1]);
+		final LineData[] data = store.get(0x12345678).getData();
+		assertNull(data[0]);
+		assertNull(data[1]);
 	}
 
 	public void assertDisconnected(Class<?> expected) {
