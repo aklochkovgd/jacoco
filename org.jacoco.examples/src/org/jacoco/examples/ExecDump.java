@@ -57,23 +57,14 @@ public final class ExecDump {
 			public void visitClassExecution(final ExecutionData data) {
 				System.out.printf("%016x  %3d of %3d   %s%n",
 						Long.valueOf(data.getId()),
-						Integer.valueOf(getHitCount(data.getData())),
-						Integer.valueOf(data.getData().length), data.getName());
+						Integer.valueOf(data.getData().getHitCount()),
+						Integer.valueOf(data.getData().getLength()),
+						data.getName());
 			}
 		});
 		reader.read();
 		in.close();
 		System.out.println();
-	}
-
-	private static int getHitCount(final boolean[] data) {
-		int count = 0;
-		for (final boolean hit : data) {
-			if (hit) {
-				count++;
-			}
-		}
-		return count;
 	}
 
 	private ExecDump() {

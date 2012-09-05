@@ -11,8 +11,10 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import org.jacoco.core.data.ProbeDataStrategy;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 /**
  * Constants and utilities for byte code instrumentation.
@@ -36,11 +38,15 @@ public final class InstrSupport {
 	public static final int DATAFIELD_ACC = Opcodes.ACC_SYNTHETIC
 			| Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_TRANSIENT;
 
+	public static final String PROBE_DATA_CLASS = Type
+			.getInternalName(ProbeDataStrategy.INSTANCE.getProbeDataClass());
+
 	/**
 	 * Data type of the field that stores coverage information for a class (
-	 * <code>boolean[]</code>).
+	 * <code>PobeData</code>).
 	 */
-	public static final String DATAFIELD_DESC = "[Z";
+	public static final String DATAFIELD_DESC = "L" + PROBE_DATA_CLASS + ";";
+	// public static final String DATAFIELD_DESC = "[Z";
 
 	// === Init Method ===
 
@@ -52,7 +58,8 @@ public final class InstrSupport {
 	/**
 	 * Descriptor of the initialization method.
 	 */
-	public static final String INITMETHOD_DESC = "()[Z";
+	public static final String INITMETHOD_DESC = "()L" + PROBE_DATA_CLASS + ";";
+	// public static final String INITMETHOD_DESC = "()[Z";
 
 	/**
 	 * Access modifiers of the initialization method.

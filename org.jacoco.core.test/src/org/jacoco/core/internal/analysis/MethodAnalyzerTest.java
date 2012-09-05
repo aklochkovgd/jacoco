@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import org.jacoco.core.analysis.ILine;
 import org.jacoco.core.analysis.IMethodCoverage;
+import org.jacoco.core.data.BooleanProbeData;
 import org.jacoco.core.internal.flow.IProbeIdGenerator;
 import org.jacoco.core.internal.flow.LabelFlowAnalyzer;
 import org.jacoco.core.internal.flow.MethodProbesAdapter;
@@ -555,7 +556,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	private void runMethodAnalzer() {
 		method.accept(new LabelFlowAnalyzer());
 		final MethodAnalyzer analyzer = new MethodAnalyzer("doit", "()V", null,
-				probes);
+				probes == null ? null : new BooleanProbeData(probes));
 		method.accept(new MethodProbesAdapter(analyzer, this));
 		result = analyzer.getCoverage();
 	}

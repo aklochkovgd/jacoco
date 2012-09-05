@@ -17,8 +17,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.jacoco.core.internal.data.CompactDataInput;
-
 /**
  * Deserialization of execution data from binary streams.
  */
@@ -143,7 +141,7 @@ public class ExecutionDataReader {
 		}
 		final long id = in.readLong();
 		final String name = in.readUTF();
-		final boolean[] data = in.readBooleanArray();
+		final ProbeData data = ProbeDataStrategy.INSTANCE.readData(in);
 		executionDataVisitor.visitClassExecution(new ExecutionData(id, name,
 				data));
 	}

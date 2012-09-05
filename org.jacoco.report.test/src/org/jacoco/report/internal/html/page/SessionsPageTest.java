@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jacoco.core.data.BooleanProbeData;
 import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.data.SessionInfo;
 import org.jacoco.report.internal.html.HTMLElement;
@@ -102,9 +103,9 @@ public class SessionsPageTest extends PageTestBase {
 	@Test
 	public void testExecutionDataContent() throws Exception {
 		final Collection<ExecutionData> data = new ArrayList<ExecutionData>();
-		data.add(new ExecutionData(0x1000, "ClassB", new boolean[0]));
-		data.add(new ExecutionData(0x1001, "ClassC", new boolean[0]));
-		data.add(new ExecutionData(0x1002, "ClassA", new boolean[0]));
+		data.add(new ExecutionData(0x1000, "ClassB", new BooleanProbeData(0)));
+		data.add(new ExecutionData(0x1001, "ClassC", new BooleanProbeData(0)));
+		data.add(new ExecutionData(0x1002, "ClassA", new BooleanProbeData(0)));
 		index.addClass(new ReportPage(null, rootFolder, context) {
 
 			public String getLinkLabel() {

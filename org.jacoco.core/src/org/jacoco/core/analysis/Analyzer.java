@@ -21,6 +21,7 @@ import java.util.zip.ZipInputStream;
 
 import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.data.ExecutionDataStore;
+import org.jacoco.core.data.ProbeData;
 import org.jacoco.core.internal.analysis.ClassAnalyzer;
 import org.jacoco.core.internal.analysis.ContentTypeDetector;
 import org.jacoco.core.internal.analysis.StringPool;
@@ -70,7 +71,7 @@ public class Analyzer {
 	 */
 	private ClassVisitor createAnalyzingVisitor(final long classid) {
 		final ExecutionData data = executionData.get(classid);
-		final boolean[] classExec = data == null ? null : data.getData();
+		final ProbeData classExec = data == null ? null : data.getData();
 		final ClassAnalyzer analyzer = new ClassAnalyzer(classid, classExec,
 				stringPool) {
 			@Override

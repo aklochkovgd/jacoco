@@ -14,8 +14,7 @@ package org.jacoco.agent.rt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.util.Arrays;
-
+import org.jacoco.core.data.ProbeData;
 import org.jacoco.core.runtime.AbstractRuntime;
 import org.jacoco.core.runtime.IRuntime;
 import org.objectweb.asm.MethodVisitor;
@@ -49,14 +48,15 @@ public class StubRuntime extends AbstractRuntime {
 	}
 
 	public void fillProbes() {
-		final boolean[] data = store.get(0x12345678).getData();
-		Arrays.fill(data, true);
+		final ProbeData data = store.get(0x12345678).getData();
+		for (int i = 0; i < data.getLength(); i++)
+			data.setCovered(i);
 	}
 
 	public void assertNoProbes() {
-		final boolean[] data = store.get(0x12345678).getData();
-		assertFalse(data[0]);
-		assertFalse(data[1]);
+		final ProbeData data = store.get(0x12345678).getData();
+		assertFalse(data.isCovered(0));
+		assertFalse(data.isCovered(1));
 	}
 
 	public void assertDisconnected(Class<?> expected) {

@@ -111,7 +111,7 @@ class ExecutionDataAccess {
 	 * Generates the code that calls the runtime data access through the JRE API
 	 * method {@link Object#equals(Object)}. The code pops a {@link Object}
 	 * instance from the stack and pushes the probe array of type
-	 * <code>boolean[]</code> on the operand stack. The generated code requires
+	 * <code>ProbeData</code> on the operand stack. The generated code requires
 	 * a stack size of 6.
 	 * 
 	 * @param classid
@@ -145,7 +145,7 @@ class ExecutionDataAccess {
 
 		// stack[0]: [Z
 
-		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.DATAFIELD_DESC);
+		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.PROBE_DATA_CLASS);
 	}
 
 	/**

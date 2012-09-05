@@ -29,7 +29,7 @@ import org.objectweb.asm.Opcodes;
 public class ClassInstrumenter extends ClassAdapter implements
 		IClassProbesVisitor {
 
-	private static final Object[] STACK_ARRZ = new Object[] { InstrSupport.DATAFIELD_DESC };
+	private static final Object[] STACK_ARRZ = new Object[] { InstrSupport.PROBE_DATA_CLASS };
 	private static final Object[] NO_LOCALS = new Object[0];
 
 	private final long id;

@@ -53,9 +53,10 @@ public class ExecutionDataStoreTest implements IExecutionDataVisitor {
 	@Test
 	public void testPut() {
 		final boolean[] probes = new boolean[] { false, false, true };
-		store.put(new ExecutionData(1000, "Sample", probes));
+		BooleanProbeData src = new BooleanProbeData(probes);
+		store.put(new ExecutionData(1000, "Sample", src));
 		final ExecutionData data = store.get(1000);
-		assertSame(probes, data.getData());
+		assertSame(src, data.getData());
 		store.accept(this);
 		assertEquals(Collections.singletonMap(Long.valueOf(1000), data),
 				dataOutput);
@@ -63,7 +64,7 @@ public class ExecutionDataStoreTest implements IExecutionDataVisitor {
 
 	@Test
 	public void testGetContents() {
-		final boolean[] probes = new boolean[] {};
+		final BooleanProbeData probes = new BooleanProbeData(0);
 		final ExecutionData a = new ExecutionData(1000, "A", probes);
 		store.put(a);
 		final ExecutionData aa = new ExecutionData(1000, "A", probes);
@@ -80,7 +81,7 @@ public class ExecutionDataStoreTest implements IExecutionDataVisitor {
 	@Test
 	public void testGetWithoutCreate() {
 		final ExecutionData data = new ExecutionData(1000, "Sample",
-				new boolean[] {});
+				new BooleanProbeData(0));
 		store.put(data);
 		assertSame(data, store.get(1000));
 	}
@@ -91,67 +92,74 @@ public class ExecutionDataStoreTest implements IExecutionDataVisitor {
 		final ExecutionData data = store.get(id, "Sample", 3);
 		assertEquals(1000, data.getId());
 		assertEquals("Sample", data.getName());
-		assertEquals(3, data.getData().length);
-		assertFalse(data.getData()[0]);
-		assertFalse(data.getData()[1]);
-		assertFalse(data.getData()[2]);
+		assertEquals(3, data.getData().getLength());
+		assertFalse(data.getData().isCovered(0));
+		assertFalse(data.getData().isCovered(1));
+		assertFalse(data.getData().isCovered(2));
 		assertSame(data, store.get(id, "Sample", 3));
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testGetNegative1() {
-		final boolean[] data = new boolean[] { false, false, true };
-		store.put(new ExecutionData(1000, "Sample", data));
+		final boolean[] probes = new boolean[] { false, false, true };
+		store.put(new ExecutionData(1000, "Sample",
+				new BooleanProbeData(probes)));
 		store.get(Long.valueOf(1000), "Other", 3);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testGetNegative2() {
-		final boolean[] data = new boolean[] { false, false, true };
-		store.put(new ExecutionData(1000, "Sample", data));
+		final boolean[] probes = new boolean[] { false, false, true };
+		store.put(new ExecutionData(1000, "Sample",
+				new BooleanProbeData(probes)));
 		store.get(Long.valueOf(1000), "Sample", 4);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testPutNegative() {
-		final boolean[] data = new boolean[0];
+		final BooleanProbeData data = new BooleanProbeData(0);
 		store.put(new ExecutionData(1000, "Sample1", data));
 		store.put(new ExecutionData(1000, "Sample2", data));
 	}
 
 	@Test
 	public void testMerge() {
-		final boolean[] data1 = new boolean[] { false, true, false, true };
-		store.visitClassExecution(new ExecutionData(1000, "Sample", data1));
-		final boolean[] data2 = new boolean[] { false, true, true, false };
-		store.visitClassExecution(new ExecutionData(1000, "Sample", data2));
+		final boolean[] probes1 = new boolean[] { false, true, false, true };
+		store.visitClassExecution(new ExecutionData(1000, "Sample",
+				new BooleanProbeData(probes1)));
+		final boolean[] probes2 = new boolean[] { false, true, true, false };
+		store.visitClassExecution(new ExecutionData(1000, "Sample",
+				new BooleanProbeData(probes2)));
 
-		final boolean[] result = store.get(1000).getData();
-		assertFalse(result[0]);
-		assertTrue(result[1]);
-		assertTrue(result[2]);
-		assertTrue(result[3]);
+		final ProbeData result = store.get(1000).getData();
+		assertFalse(result.isCovered(0));
+		assertTrue(result.isCovered(1));
+		assertTrue(result.isCovered(2));
+		assertTrue(result.isCovered(3));
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testMergeNegative() {
-		final boolean[] data1 = new boolean[] { false, false };
-		store.visitClassExecution(new ExecutionData(1000, "Sample", data1));
-		final boolean[] data2 = new boolean[] { false, false, false };
-		store.visitClassExecution(new ExecutionData(1000, "Sample", data2));
+		final boolean[] probes1 = new boolean[] { false, false };
+		store.visitClassExecution(new ExecutionData(1000, "Sample",
+				new BooleanProbeData(probes1)));
+		final boolean[] probes2 = new boolean[] { false, false, false };
+		store.visitClassExecution(new ExecutionData(1000, "Sample",
+				new BooleanProbeData(probes2)));
 	}
 
 	@Test
 	public void testReset() throws InstantiationException,
 			IllegalAccessException {
-		final boolean[] data1 = new boolean[] { true, true, false };
-		store.put(new ExecutionData(1000, "Sample", data1));
+		final boolean[] probes1 = new boolean[] { true, true, false };
+		store.put(new ExecutionData(1000, "Sample", new BooleanProbeData(
+				probes1)));
 		store.reset();
-		final boolean[] data2 = store.get(1000).getData();
-		assertNotNull(data2);
-		assertFalse(data2[0]);
-		assertFalse(data2[1]);
-		assertFalse(data2[2]);
+		final ProbeData data = store.get(1000).getData();
+		assertNotNull(data);
+		assertFalse(data.isCovered(0));
+		assertFalse(data.isCovered(1));
+		assertFalse(data.isCovered(2));
 	}
 
 	// === IExecutionDataOutput ===

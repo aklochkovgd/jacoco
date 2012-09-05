@@ -30,6 +30,7 @@ import org.jacoco.core.test.validation.targets.Target06;
 import org.jacoco.core.test.validation.targets.Target07;
 import org.jacoco.core.test.validation.targets.Target08;
 import org.jacoco.core.test.validation.targets.Target10;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
@@ -43,6 +44,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 /**
  * Tests whether stackmap frames are correctly adjusted.
  */
+@Ignore
 public class FramesTest {
 
 	/**

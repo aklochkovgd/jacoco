@@ -22,9 +22,11 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jacoco.core.data.BooleanProbeData;
 import org.jacoco.core.data.ExecutionData;
 import org.jacoco.core.data.IExecutionDataVisitor;
 import org.jacoco.core.data.ISessionInfoVisitor;
+import org.jacoco.core.data.ProbeData;
 import org.jacoco.core.data.SessionInfo;
 import org.jacoco.core.internal.instr.InstrSupport;
 import org.jacoco.core.test.TargetLoader;
@@ -91,9 +93,9 @@ public abstract class RuntimeTestBase {
 
 		runtime.reset();
 
-		final boolean[] data = target.get();
-		assertFalse(data[0]);
-		assertFalse(data[1]);
+		final ProbeData data = target.get();
+		assertFalse(data.isCovered(0));
+		assertFalse(data.isCovered(1));
 	}
 
 	@Test
@@ -105,11 +107,11 @@ public abstract class RuntimeTestBase {
 
 		runtime.collect(storage, null, true);
 
-		final boolean[] data = target.get();
+		final ProbeData data = target.get();
 		storage.assertSize(1);
 		storage.assertData(1001, data);
-		assertFalse(data[0]);
-		assertFalse(data[1]);
+		assertFalse(data.isCovered(0));
+		assertFalse(data.isCovered(1));
 	}
 
 	@Test
@@ -156,9 +158,9 @@ public abstract class RuntimeTestBase {
 		generateAndInstantiateClass(1001).a();
 		runtime.collect(storage, null, false);
 		storage.assertSize(1);
-		final boolean[] data = storage.getData(1001);
-		assertTrue(data[0]);
-		assertFalse(data[1]);
+		final ProbeData data = storage.getData(1001);
+		assertTrue(data.isCovered(0));
+		assertFalse(data.isCovered(1));
 	}
 
 	@Test
@@ -168,9 +170,9 @@ public abstract class RuntimeTestBase {
 		generateAndInstantiateClass(1001).b();
 		runtime.collect(storage, null, false);
 		storage.assertSize(1);
-		final boolean[] data = storage.getData(1001);
-		assertTrue(data[0]);
-		assertTrue(data[1]);
+		final ProbeData data = storage.getData(1001);
+		assertTrue(data.isCovered(0));
+		assertTrue(data.isCovered(1));
 	}
 
 	@Test
@@ -181,8 +183,8 @@ public abstract class RuntimeTestBase {
 		assertNull(target.get());
 		runtime.collect(storage, null, false);
 		storage.assertSize(1);
-		final boolean[] data = storage.getData(1001);
-		assertTrue(data[0]);
+		final ProbeData data = storage.getData(1001);
+		assertTrue(data.isCovered(0));
 	}
 
 	@Test
@@ -228,18 +230,19 @@ public abstract class RuntimeTestBase {
 		final int size = runtime.generateDataAccessor(classid, className, 2,
 				gen);
 		gen.putStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+				Type.getObjectType(InstrSupport.PROBE_DATA_CLASS));
 		gen.returnValue();
 		gen.visitMaxs(size + 1, 0);
 		gen.visitEnd();
 
 		// get()
 		gen = new GeneratorAdapter(writer.visitMethod(Opcodes.ACC_PUBLIC,
-				"get", "()[Z", null, new String[0]), Opcodes.ACC_PUBLIC, "get",
-				"()[Z");
+				"get", "()L" + InstrSupport.PROBE_DATA_CLASS + ";", null,
+				new String[0]), Opcodes.ACC_PUBLIC, "get", "()L"
+				+ InstrSupport.PROBE_DATA_CLASS + ";");
 		gen.visitCode();
 		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+				Type.getObjectType(InstrSupport.PROBE_DATA_CLASS));
 		gen.returnValue();
 		gen.visitMaxs(1, 0);
 		gen.visitEnd();
@@ -249,12 +252,12 @@ public abstract class RuntimeTestBase {
 				"()V", null, new String[0]), Opcodes.ACC_PUBLIC, "a", "()V");
 		gen.visitCode();
 		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+				Type.getObjectType(InstrSupport.PROBE_DATA_CLASS));
 		gen.push(0);
-		gen.push(1);
-		gen.arrayStore(Type.BOOLEAN_TYPE);
+		gen.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.PROBE_DATA_CLASS, "setCovered", "(I)V");
 		gen.returnValue();
-		gen.visitMaxs(3, 0);
+		gen.visitMaxs(5, 0);
 		gen.visitEnd();
 
 		// b()
@@ -262,12 +265,12 @@ public abstract class RuntimeTestBase {
 				"()V", null, new String[0]), Opcodes.ACC_PUBLIC, "b", "()V");
 		gen.visitCode();
 		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
-				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
+				Type.getObjectType(InstrSupport.PROBE_DATA_CLASS));
 		gen.push(1);
-		gen.push(1);
-		gen.arrayStore(Type.BOOLEAN_TYPE);
+		gen.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.PROBE_DATA_CLASS, "setCovered", "(I)V");
 		gen.returnValue();
-		gen.visitMaxs(3, 0);
+		gen.visitMaxs(5, 0);
 		gen.visitEnd();
 
 		writer.visitEnd();
@@ -288,7 +291,7 @@ public abstract class RuntimeTestBase {
 		 * 
 		 * @return the probe array
 		 */
-		boolean[] get();
+		BooleanProbeData get();
 
 		/**
 		 * The implementation will mark probe 0 as executed
@@ -304,17 +307,17 @@ public abstract class RuntimeTestBase {
 
 	private static class TestStorage implements IExecutionDataVisitor {
 
-		private final Map<Long, boolean[]> data = new HashMap<Long, boolean[]>();
+		private final Map<Long, ProbeData> data = new HashMap<Long, ProbeData>();
 
 		public void assertSize(int size) {
 			assertEquals(size, data.size(), 0.0);
 		}
 
-		public boolean[] getData(long classId) {
+		public ProbeData getData(long classId) {
 			return data.get(Long.valueOf(classId));
 		}
 
-		public void assertData(long classId, boolean[] expected) {
+		public void assertData(long classId, ProbeData expected) {
 			assertSame(expected, getData(classId));
 		}
 

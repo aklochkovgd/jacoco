@@ -13,11 +13,9 @@ package org.jacoco.core.data;
 
 import static java.lang.String.format;
 
-import java.util.Arrays;
-
 /**
  * Execution data for a single Java class. While instances are immutable care
- * has to be taken about the probe data array of type <code>boolean[]</code>
+ * has to be taken about the probe data array of type <code>ProbeData</code>
  * which can be modified.
  */
 public final class ExecutionData {
@@ -26,7 +24,7 @@ public final class ExecutionData {
 
 	private final String name;
 
-	private final boolean[] data;
+	private final ProbeData data;
 
 	/**
 	 * Creates a new {@link ExecutionData} object with the given probe data.
@@ -38,7 +36,7 @@ public final class ExecutionData {
 	 * @param data
 	 *            probe data
 	 */
-	public ExecutionData(final long id, final String name, final boolean[] data) {
+	public ExecutionData(final long id, final String name, final ProbeData data) {
 		this.id = id;
 		this.name = name;
 		this.data = data;
@@ -58,7 +56,7 @@ public final class ExecutionData {
 	public ExecutionData(final long id, final String name, final int dataLength) {
 		this.id = id;
 		this.name = name;
-		this.data = new boolean[dataLength];
+		this.data = ProbeDataStrategy.INSTANCE.newProbeData(dataLength);
 	}
 
 	/**
@@ -86,7 +84,7 @@ public final class ExecutionData {
 	 * 
 	 * @return execution data
 	 */
-	public boolean[] getData() {
+	public ProbeData getData() {
 		return data;
 	}
 
@@ -94,7 +92,8 @@ public final class ExecutionData {
 	 * Sets all probe data entries to <code>false</code>.
 	 */
 	public void reset() {
-		Arrays.fill(data, false);
+		// Arrays.fill(data, null);
+		data.reset();
 	}
 
 	/**
@@ -106,14 +105,9 @@ public final class ExecutionData {
 	 * @param other
 	 */
 	public void merge(final ExecutionData other) {
-		assertCompatibility(other.getId(), other.getName(),
-				other.getData().length);
-		final boolean[] otherData = other.getData();
-		for (int i = 0; i < data.length; i++) {
-			if (otherData[i]) {
-				data[i] = true;
-			}
-		}
+		assertCompatibility(other.getId(), other.getName(), other.getData()
+				.getLength());
+		data.merge(other.getData());
 	}
 
 	/**
@@ -126,7 +120,7 @@ public final class ExecutionData {
 	 * @param name
 	 *            other name, must be equal to this name
 	 * @param dataLength
-	 *            probe data length, must be the same as for this data
+	 *            probe data
 	 * @throws IllegalStateException
 	 *             if the given parameters do not match this instance
 	 */
@@ -142,7 +136,7 @@ public final class ExecutionData {
 					"Different class names %s and %s for id %016x.", this.name,
 					name, Long.valueOf(id)));
 		}
-		if (this.data.length != dataLength) {
+		if (this.data.getLength() != dataLength) {
 			throw new IllegalStateException(format(
 					"Incompatible execution data for class %s with id %016x.",
 					name, Long.valueOf(id)));

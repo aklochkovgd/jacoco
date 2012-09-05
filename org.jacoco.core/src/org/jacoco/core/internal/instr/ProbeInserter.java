@@ -82,20 +82,15 @@ class ProbeInserter extends MethodAdapter implements IProbeInserter {
 
 		mv.visitVarInsn(Opcodes.ALOAD, variable);
 
-		// Stack[0]: [Z
+		// Stack[0]: Lorg.jacoco.core.data.ProbeData;
 
 		InstrSupport.push(mv, id);
 
 		// Stack[1]: I
-		// Stack[0]: [Z
+		// Stack[0]: Lorg.jacoco.core.data.ProbeData;
 
-		mv.visitInsn(Opcodes.ICONST_1);
-
-		// Stack[2]: I
-		// Stack[1]: I
-		// Stack[0]: [Z
-
-		mv.visitInsn(Opcodes.BASTORE);
+		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.PROBE_DATA_CLASS, "setCovered", "(I)V");
 	}
 
 	private void checkLoad() {
@@ -214,7 +209,7 @@ class ProbeInserter extends MethodAdapter implements IProbeInserter {
 		// original stack size depending on the probe locations. The accessor
 		// stack size is an absolute maximum, as the accessor code is inserted
 		// at the very beginning of each method when the stack size is empty.
-		final int increasedStack = Math.max(maxStack + 3, accessorStackSize);
+		final int increasedStack = Math.max(maxStack + 2, accessorStackSize);
 		mv.visitMaxs(increasedStack, maxLocals + 1);
 	}
 

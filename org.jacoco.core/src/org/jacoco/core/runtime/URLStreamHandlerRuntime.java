@@ -121,7 +121,7 @@ public class URLStreamHandlerRuntime extends AbstractRuntime {
 
 		mv.visitInsn(Opcodes.ICONST_0);
 		mv.visitInsn(Opcodes.AALOAD);
-		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.DATAFIELD_DESC);
+		mv.visitTypeInsn(Opcodes.CHECKCAST, InstrSupport.PROBE_DATA_CLASS);
 
 		return 7;
 	}
