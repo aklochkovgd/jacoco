@@ -16,6 +16,8 @@ import static java.lang.String.format;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.BitSet;
 
 import org.jacoco.core.internal.data.CompactDataInput;
 
@@ -143,7 +145,19 @@ public class ExecutionDataReader {
 		}
 		final long id = in.readLong();
 		final String name = in.readUTF();
-		final boolean[] data = in.readBooleanArray();
+		final int len = in.readVarInt();
+		final BitSet[] data = new BitSet[len];
+		final ObjectInputStream s = new ObjectInputStream(in);
+		for (int i = 0; i < len; i++) {
+			try {
+				final BitSet bs = (BitSet) s.readObject();
+				if (bs.length() > 0) {
+					data[i] = bs;
+				}
+			} catch (final ClassNotFoundException e) {
+			}
+		}
+
 		executionDataVisitor.visitClassExecution(new ExecutionData(id, name,
 				data));
 	}

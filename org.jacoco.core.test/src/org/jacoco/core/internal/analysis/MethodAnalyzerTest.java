@@ -14,6 +14,7 @@ package org.jacoco.core.internal.analysis;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import org.jacoco.core.analysis.ILine;
 import org.jacoco.core.analysis.IMethodCoverage;
@@ -32,9 +33,14 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  */
 public class MethodAnalyzerTest implements IProbeIdGenerator {
 
+	private final static BitSet TEST1 = new BitSet();
+	static {
+		TEST1.set(1);
+	}
+
 	private int nextProbeId;
 
-	private boolean[] probes;
+	private BitSet[] probes;
 
 	private MethodNode method;
 
@@ -45,7 +51,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 		nextProbeId = 0;
 		method = new MethodNode();
 		method.tryCatchBlocks = new ArrayList<TryCatchBlockNode>();
-		probes = new boolean[32];
+		probes = new BitSet[32];
 	}
 
 	public int nextId() {
@@ -85,7 +91,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testLinearSequenceCovered() {
 		createLinearSequence();
-		probes[0] = true;
+		probes[0] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 1, 0, 0);
@@ -122,7 +128,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testIfBranchCovered1() {
 		createIfBranch();
-		probes[0] = true;
+		probes[0] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 2, 1, 1);
@@ -133,7 +139,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testIfBranchCovered2() {
 		createIfBranch();
-		probes[1] = true;
+		probes[1] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 2, 1, 1);
@@ -144,8 +150,8 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testIfBranchCovered3() {
 		createIfBranch();
-		probes[0] = true;
-		probes[1] = true;
+		probes[0] = TEST1;
+		probes[1] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 2, 0, 2);
@@ -181,7 +187,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testIfBranchMergeCovered1() {
 		createIfBranchMerge();
-		probes[0] = true;
+		probes[0] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 2, 1, 1);
@@ -192,7 +198,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testIfBranchMergeCovered2() {
 		createIfBranchMerge();
-		probes[1] = true;
+		probes[1] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 2, 1, 1);
@@ -203,9 +209,9 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testIfBranchMergeCovered3() {
 		createIfBranchMerge();
-		probes[0] = true;
-		probes[1] = true;
-		probes[2] = true;
+		probes[0] = TEST1;
+		probes[1] = TEST1;
+		probes[2] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 2, 0, 2);
@@ -242,7 +248,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testJumpBackwardsCovered() {
 		createJumpBackwards();
-		probes[0] = true;
+		probes[0] = TEST1;
 		runMethodAnalzer();
 
 		assertLine(1001, 0, 1, 0, 0);
@@ -278,7 +284,7 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testJumpToFirstCovered1() {
 		createJumpToFirst();
-		probes[0] = true;
+		probes[0] = TEST1;
 		runMethodAnalzer();
 		assertEquals(2, nextProbeId);
 
@@ -289,8 +295,8 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testJumpToFirstCovered2() {
 		createJumpToFirst();
-		probes[0] = true;
-		probes[1] = true;
+		probes[0] = TEST1;
+		probes[1] = TEST1;
 		runMethodAnalzer();
 		assertEquals(2, nextProbeId);
 
@@ -348,8 +354,8 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchCovered1() {
 		createTableSwitch();
-		probes[0] = true;
-		probes[3] = true;
+		probes[0] = TEST1;
+		probes[3] = TEST1;
 		runMethodAnalzer();
 		assertEquals(4, nextProbeId);
 
@@ -365,8 +371,8 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchCovered2() {
 		createTableSwitch();
-		probes[2] = true;
-		probes[3] = true;
+		probes[2] = TEST1;
+		probes[3] = TEST1;
 		runMethodAnalzer();
 		assertEquals(4, nextProbeId);
 
@@ -382,10 +388,10 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchCovered3() {
 		createTableSwitch();
-		probes[0] = true;
-		probes[1] = true;
-		probes[2] = true;
-		probes[3] = true;
+		probes[0] = TEST1;
+		probes[1] = TEST1;
+		probes[2] = TEST1;
+		probes[3] = TEST1;
 		runMethodAnalzer();
 		assertEquals(4, nextProbeId);
 
@@ -438,8 +444,8 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchMergeNotCovered1() {
 		createTableSwitchMerge();
-		probes[0] = true;
-		probes[4] = true;
+		probes[0] = TEST1;
+		probes[4] = TEST1;
 		runMethodAnalzer();
 		assertEquals(5, nextProbeId);
 
@@ -453,9 +459,9 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchMergeNotCovered2() {
 		createTableSwitchMerge();
-		probes[1] = true;
-		probes[3] = true;
-		probes[4] = true;
+		probes[1] = TEST1;
+		probes[3] = TEST1;
+		probes[4] = TEST1;
 		runMethodAnalzer();
 		assertEquals(5, nextProbeId);
 
@@ -469,9 +475,9 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchMergeNotCovered3() {
 		createTableSwitchMerge();
-		probes[2] = true;
-		probes[3] = true;
-		probes[4] = true;
+		probes[2] = TEST1;
+		probes[3] = TEST1;
+		probes[4] = TEST1;
 		runMethodAnalzer();
 		assertEquals(5, nextProbeId);
 
@@ -485,11 +491,11 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTableSwitchMergeNotCovered4() {
 		createTableSwitchMerge();
-		probes[0] = true;
-		probes[1] = true;
-		probes[2] = true;
-		probes[3] = true;
-		probes[4] = true;
+		probes[0] = TEST1;
+		probes[1] = TEST1;
+		probes[2] = TEST1;
+		probes[3] = TEST1;
+		probes[4] = TEST1;
 		runMethodAnalzer();
 		assertEquals(5, nextProbeId);
 
@@ -539,9 +545,9 @@ public class MethodAnalyzerTest implements IProbeIdGenerator {
 	@Test
 	public void testTryCatchBlockFullyCovered() {
 		createTryCatchBlock();
-		probes[0] = true;
-		probes[1] = true;
-		probes[2] = true;
+		probes[0] = TEST1;
+		probes[1] = TEST1;
+		probes[2] = TEST1;
 		runMethodAnalzer();
 		assertEquals(3, nextProbeId);
 		assertEquals(CounterImpl.getInstance(0, 5),

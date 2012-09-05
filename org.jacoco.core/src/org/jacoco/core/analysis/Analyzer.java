@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.BitSet;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -70,7 +71,7 @@ public class Analyzer {
 	 */
 	private ClassVisitor createAnalyzingVisitor(final long classid) {
 		final ExecutionData data = executionData.get(classid);
-		final boolean[] classExec = data == null ? null : data.getData();
+		final BitSet[] classExec = data == null ? null : data.getData();
 		final ClassAnalyzer analyzer = new ClassAnalyzer(classid, classExec,
 				stringPool) {
 			@Override

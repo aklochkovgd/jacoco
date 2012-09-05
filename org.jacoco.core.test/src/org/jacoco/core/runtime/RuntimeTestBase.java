@@ -12,13 +12,13 @@
 package org.jacoco.core.runtime;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,9 +91,9 @@ public abstract class RuntimeTestBase {
 
 		runtime.reset();
 
-		final boolean[] data = target.get();
-		assertFalse(data[0]);
-		assertFalse(data[1]);
+		final BitSet[] data = target.get();
+		assertNull(data[0]);
+		assertNull(data[1]);
 	}
 
 	@Test
@@ -105,11 +105,11 @@ public abstract class RuntimeTestBase {
 
 		runtime.collect(storage, null, true);
 
-		final boolean[] data = target.get();
+		final BitSet[] data = target.get();
 		storage.assertSize(1);
 		storage.assertData(1001, data);
-		assertFalse(data[0]);
-		assertFalse(data[1]);
+		assertNull(data[0]);
+		assertNull(data[1]);
 	}
 
 	@Test
@@ -156,9 +156,9 @@ public abstract class RuntimeTestBase {
 		generateAndInstantiateClass(1001).a();
 		runtime.collect(storage, null, false);
 		storage.assertSize(1);
-		final boolean[] data = storage.getData(1001);
-		assertTrue(data[0]);
-		assertFalse(data[1]);
+		final BitSet[] data = storage.getData(1001);
+		assertTrue(data[0].length() > 0);
+		assertNull(data[1]);
 	}
 
 	@Test
@@ -168,9 +168,9 @@ public abstract class RuntimeTestBase {
 		generateAndInstantiateClass(1001).b();
 		runtime.collect(storage, null, false);
 		storage.assertSize(1);
-		final boolean[] data = storage.getData(1001);
-		assertTrue(data[0]);
-		assertTrue(data[1]);
+		final BitSet[] data = storage.getData(1001);
+		assertTrue(data[0].length() > 0);
+		assertTrue(data[1].length() > 0);
 	}
 
 	@Test
@@ -181,8 +181,8 @@ public abstract class RuntimeTestBase {
 		assertNull(target.get());
 		runtime.collect(storage, null, false);
 		storage.assertSize(1);
-		final boolean[] data = storage.getData(1001);
-		assertTrue(data[0]);
+		final BitSet[] data = storage.getData(1001);
+		assertTrue(data[0].length() > 0);
 	}
 
 	@Test
@@ -235,8 +235,9 @@ public abstract class RuntimeTestBase {
 
 		// get()
 		gen = new GeneratorAdapter(writer.visitMethod(Opcodes.ACC_PUBLIC,
-				"get", "()[Z", null, new String[0]), Opcodes.ACC_PUBLIC, "get",
-				"()[Z");
+				"get", "()[L" + InstrSupport.LINE_DATA_CLASS + ";", null,
+				new String[0]), Opcodes.ACC_PUBLIC, "get", "()[L"
+				+ InstrSupport.LINE_DATA_CLASS + ";");
 		gen.visitCode();
 		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
 				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
@@ -251,10 +252,19 @@ public abstract class RuntimeTestBase {
 		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
 				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
 		gen.push(0);
-		gen.push(1);
-		gen.arrayStore(Type.BOOLEAN_TYPE);
+		Type lineDataType = Type.getObjectType(InstrSupport.LINE_DATA_CLASS);
+		gen.newInstance(lineDataType);
+		gen.dup();
+		gen.invokeConstructor(lineDataType, new Method("<init>", "()V"));
+		gen.visitVarInsn(Opcodes.ASTORE, 1);
+		gen.visitVarInsn(Opcodes.ALOAD, 1);
+		gen.visitInsn(Opcodes.ICONST_1);
+		gen.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.LINE_DATA_CLASS, "set", "(I)V");
+		gen.visitVarInsn(Opcodes.ALOAD, 1);
+		gen.visitInsn(Opcodes.AASTORE);
 		gen.returnValue();
-		gen.visitMaxs(3, 0);
+		gen.visitMaxs(5, 0);
 		gen.visitEnd();
 
 		// b()
@@ -264,10 +274,18 @@ public abstract class RuntimeTestBase {
 		gen.getStatic(classType, InstrSupport.DATAFIELD_NAME,
 				Type.getObjectType(InstrSupport.DATAFIELD_DESC));
 		gen.push(1);
-		gen.push(1);
-		gen.arrayStore(Type.BOOLEAN_TYPE);
+		gen.newInstance(lineDataType);
+		gen.dup();
+		gen.invokeConstructor(lineDataType, new Method("<init>", "()V"));
+		gen.visitVarInsn(Opcodes.ASTORE, 1);
+		gen.visitVarInsn(Opcodes.ALOAD, 1);
+		gen.visitInsn(Opcodes.ICONST_1);
+		gen.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.LINE_DATA_CLASS, "set", "(I)V");
+		gen.visitVarInsn(Opcodes.ALOAD, 1);
+		gen.visitInsn(Opcodes.AASTORE);
 		gen.returnValue();
-		gen.visitMaxs(3, 0);
+		gen.visitMaxs(5, 0);
 		gen.visitEnd();
 
 		writer.visitEnd();
@@ -288,7 +306,7 @@ public abstract class RuntimeTestBase {
 		 * 
 		 * @return the probe array
 		 */
-		boolean[] get();
+		BitSet[] get();
 
 		/**
 		 * The implementation will mark probe 0 as executed
@@ -304,17 +322,17 @@ public abstract class RuntimeTestBase {
 
 	private static class TestStorage implements IExecutionDataVisitor {
 
-		private final Map<Long, boolean[]> data = new HashMap<Long, boolean[]>();
+		private final Map<Long, BitSet[]> data = new HashMap<Long, BitSet[]>();
 
 		public void assertSize(int size) {
 			assertEquals(size, data.size(), 0.0);
 		}
 
-		public boolean[] getData(long classId) {
+		public BitSet[] getData(long classId) {
 			return data.get(Long.valueOf(classId));
 		}
 
-		public void assertData(long classId, boolean[] expected) {
+		public void assertData(long classId, BitSet[] expected) {
 			assertSame(expected, getData(classId));
 		}
 

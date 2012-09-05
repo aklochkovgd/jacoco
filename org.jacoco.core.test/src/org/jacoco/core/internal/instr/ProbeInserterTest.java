@@ -61,8 +61,15 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 0);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, InstrSupport.LINE_DATA_CLASS);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				InstrSupport.LINE_DATA_CLASS, "<init>", "()V");
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.LINE_DATA_CLASS, "set", "(I)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -73,8 +80,15 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 1);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, InstrSupport.LINE_DATA_CLASS);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				InstrSupport.LINE_DATA_CLASS, "<init>", "()V");
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.LINE_DATA_CLASS, "set", "(I)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -86,8 +100,15 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 4);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, InstrSupport.LINE_DATA_CLASS);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				InstrSupport.LINE_DATA_CLASS, "<init>", "()V");
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.LINE_DATA_CLASS, "set", "(I)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -98,8 +119,15 @@ public class ProbeInserterTest {
 		expected.visitLdcInsn("init");
 		expected.visitVarInsn(Opcodes.ALOAD, 5);
 		expected.visitInsn(Opcodes.ICONST_0);
+		expected.visitTypeInsn(Opcodes.NEW, InstrSupport.LINE_DATA_CLASS);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitInsn(Opcodes.DUP);
+		expected.visitMethodInsn(Opcodes.INVOKESPECIAL,
+				InstrSupport.LINE_DATA_CLASS, "<init>", "()V");
 		expected.visitInsn(Opcodes.ICONST_1);
-		expected.visitInsn(Opcodes.BASTORE);
+		expected.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+				InstrSupport.LINE_DATA_CLASS, "set", "(I)V");
+		expected.visitInsn(Opcodes.AASTORE);
 	}
 
 	@Test
@@ -297,7 +325,7 @@ public class ProbeInserterTest {
 
 		expected.visitLdcInsn("init");
 		expected.visitInsn(Opcodes.NOP);
-		expected.visitMaxs(5, 9);
+		expected.visitMaxs(6, 9);
 	}
 
 	@Test
@@ -308,7 +336,7 @@ public class ProbeInserterTest {
 
 		expected.visitLdcInsn("init");
 		expected.visitInsn(Opcodes.NOP);
-		expected.visitMaxs(13, 9);
+		expected.visitMaxs(16, 9);
 	}
 
 	@Test
@@ -330,7 +358,8 @@ public class ProbeInserterTest {
 
 		// Starting from the second frame on the probe variable is inserted:
 		expected.visitFrame(Opcodes.F_NEW, 4, new Object[] { "Foo",
-				Opcodes.LONG, "[Z", "java/lang/String" }, 0, new Object[0]);
+				Opcodes.LONG, "[L" + InstrSupport.LINE_DATA_CLASS + ";",
+				"java/lang/String" }, 0, new Object[0]);
 	}
 
 	@Test
@@ -357,7 +386,8 @@ public class ProbeInserterTest {
 
 		// The locals in this frame are filled with TOP up to the probe variable
 		expected.visitFrame(Opcodes.F_NEW, 3, new Object[] { Opcodes.TOP,
-				Opcodes.TOP, "[Z", }, 1, new Object[] { "java/lang/Throwable" });
+				Opcodes.TOP, "[L" + InstrSupport.LINE_DATA_CLASS + ";", }, 1,
+				new Object[] { "java/lang/Throwable" });
 		expected.visitInsn(Opcodes.NOP);
 		expected.visitInsn(Opcodes.NOP);
 		expected.visitInsn(Opcodes.ATHROW);

@@ -11,8 +11,11 @@
  *******************************************************************************/
 package org.jacoco.core.internal.instr;
 
+import java.util.BitSet;
+
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 /**
  * Constants and utilities for byte code instrumentation.
@@ -36,11 +39,15 @@ public final class InstrSupport {
 	public static final int DATAFIELD_ACC = Opcodes.ACC_SYNTHETIC
 			| Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_TRANSIENT;
 
+	public static final String LINE_DATA_CLASS = Type
+			.getInternalName(BitSet.class);
+
 	/**
 	 * Data type of the field that stores coverage information for a class (
-	 * <code>boolean[]</code>).
+	 * <code>BitSet[]</code>).
 	 */
-	public static final String DATAFIELD_DESC = "[Z";
+	public static final String DATAFIELD_DESC = "[L" + LINE_DATA_CLASS + ";";
+	// public static final String DATAFIELD_DESC = "[Z";
 
 	// === Init Method ===
 
@@ -52,7 +59,8 @@ public final class InstrSupport {
 	/**
 	 * Descriptor of the initialization method.
 	 */
-	public static final String INITMETHOD_DESC = "()[Z";
+	public static final String INITMETHOD_DESC = "()[L" + LINE_DATA_CLASS + ";";
+	// public static final String INITMETHOD_DESC = "()[Z";
 
 	/**
 	 * Access modifiers of the initialization method.

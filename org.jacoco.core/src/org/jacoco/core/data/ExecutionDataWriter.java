@@ -13,7 +13,9 @@ package org.jacoco.core.data;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.BitSet;
 
 import org.jacoco.core.internal.data.CompactDataOutput;
 
@@ -24,7 +26,7 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 		IExecutionDataVisitor {
 
 	/** File format version, will be incremented for each incompatible change. */
-	public static final char FORMAT_VERSION = 0x1006;
+	public static final char FORMAT_VERSION = 0x1007;
 
 	/** Magic number in header for file format identification. */
 	public static final char MAGIC_NUMBER = 0xC0C0;
@@ -37,6 +39,8 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 
 	/** Block identifier for execution data of a single class. */
 	public static final byte BLOCK_EXECUTIONDATA = 0x11;
+
+	private static final BitSet EMPTY_BITSET = new BitSet(0);
 
 	/** Underlying data output */
 	protected final CompactDataOutput out;
@@ -92,7 +96,16 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 			out.writeByte(BLOCK_EXECUTIONDATA);
 			out.writeLong(data.getId());
 			out.writeUTF(data.getName());
-			out.writeBooleanArray(data.getData());
+			final BitSet[] d = data.getData();
+			out.writeVarInt(d.length);
+			final ObjectOutputStream s = new ObjectOutputStream(out);
+			for (int i = 0; i < d.length; i++) {
+				if (d[i] == null) {
+					s.writeObject(EMPTY_BITSET);
+				} else {
+					s.writeObject(d[i]);
+				}
+			}
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}

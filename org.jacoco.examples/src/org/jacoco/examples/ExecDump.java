@@ -13,6 +13,7 @@ package org.jacoco.examples;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.Date;
 
 import org.jacoco.core.data.ExecutionData;
@@ -66,11 +67,11 @@ public final class ExecDump {
 		System.out.println();
 	}
 
-	private static int getHitCount(final boolean[] data) {
+	private static int getHitCount(final BitSet[] data) {
 		int count = 0;
-		for (final boolean hit : data) {
-			if (hit) {
-				count++;
+		for (final BitSet ld : data) {
+			if (ld != null) {
+				count += ld.cardinality();
 			}
 		}
 		return count;

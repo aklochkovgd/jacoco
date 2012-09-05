@@ -13,8 +13,10 @@ package org.jacoco.core.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import java.util.BitSet;
 import java.util.concurrent.Callable;
 
 import org.jacoco.core.data.ExecutionDataStore;
@@ -59,11 +61,11 @@ public class ExecutionDataAccessTest {
 		Object[] args = new Object[] { Long.valueOf(123), "Foo",
 				Integer.valueOf(3) };
 		access.equals(args);
-		boolean[] data = (boolean[]) args[0];
+		BitSet[] data = (BitSet[]) args[0];
 		assertEquals(3, data.length, 0.0);
-		assertFalse(data[0]);
-		assertFalse(data[1]);
-		assertFalse(data[2]);
+		assertNull(data[0]);
+		assertNull(data[1]);
+		assertNull(data[2]);
 		assertSame(store.get(123).getData(), data);
 		assertEquals("Foo", store.get(123).getName());
 	}
@@ -108,7 +110,7 @@ public class ExecutionDataAccessTest {
 
 	@Test
 	public void testGenerateAccessCall() throws Exception {
-		final boolean[] data = store.get(Long.valueOf(1234), "Sample", 5)
+		final BitSet[] data = store.get(Long.valueOf(1234), "Sample", 5)
 				.getData();
 
 		final ClassWriter writer = new ClassWriter(0);

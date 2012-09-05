@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.jacoco.core.internal.analysis;
 
+import java.util.BitSet;
+
 import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.internal.flow.IClassProbesVisitor;
 import org.jacoco.core.internal.flow.IMethodProbesVisitor;
@@ -25,7 +27,7 @@ import org.objectweb.asm.Opcodes;
 public class ClassAnalyzer implements IClassProbesVisitor {
 
 	private final long classid;
-	private final boolean executionData[];
+	private final BitSet executionData[];
 	private final StringPool stringPool;
 
 	private ClassCoverageImpl coverage;
@@ -40,7 +42,7 @@ public class ClassAnalyzer implements IClassProbesVisitor {
 	 * @param stringPool
 	 *            shared pool to minimize the number of {@link String} instances
 	 */
-	public ClassAnalyzer(final long classid, final boolean[] executionData,
+	public ClassAnalyzer(final long classid, final BitSet[] executionData,
 			final StringPool stringPool) {
 		this.classid = classid;
 		this.executionData = executionData;

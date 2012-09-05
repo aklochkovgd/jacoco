@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Random;
 
 import org.junit.Before;
@@ -212,7 +213,7 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test
 	public void testMinClassId() throws IOException {
-		final boolean[] data = createData(0);
+		final BitSet[] data = createData(0);
 		writer.visitClassExecution(new ExecutionData(Long.MIN_VALUE, "Sample",
 				data));
 		assertFalse(createReaderWithVisitors().read());
@@ -221,7 +222,7 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test
 	public void testMaxClassId() throws IOException {
-		final boolean[] data = createData(0);
+		final BitSet[] data = createData(0);
 		writer.visitClassExecution(new ExecutionData(Long.MAX_VALUE, "Sample",
 				data));
 		assertFalse(createReaderWithVisitors().read());
@@ -230,7 +231,7 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test
 	public void testEmptyClass() throws IOException {
-		final boolean[] data = createData(0);
+		final BitSet[] data = createData(0);
 		writer.visitClassExecution(new ExecutionData(3, "Sample", data));
 		assertFalse(createReaderWithVisitors().read());
 		assertArrayEquals(data, store.get(3).getData());
@@ -238,7 +239,7 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test
 	public void testOneClass() throws IOException {
-		final boolean[] data = createData(5);
+		final BitSet[] data = createData(5);
 		writer.visitClassExecution(new ExecutionData(3, "Sample", data));
 		assertFalse(createReaderWithVisitors().read());
 		assertArrayEquals(data, store.get(3).getData());
@@ -246,8 +247,8 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test
 	public void testTwoClasses() throws IOException {
-		final boolean[] data1 = createData(5);
-		final boolean[] data2 = createData(7);
+		final BitSet[] data1 = createData(5);
+		final BitSet[] data2 = createData(7);
 		writer.visitClassExecution(new ExecutionData(333, "Sample", data1));
 		writer.visitClassExecution(new ExecutionData(-45, "Sample", data2));
 		assertFalse(createReaderWithVisitors().read());
@@ -257,7 +258,7 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test
 	public void testBigClass() throws IOException {
-		final boolean[] data = createData(117);
+		final BitSet[] data = createData(117);
 		writer.visitClassExecution(new ExecutionData(123, "Sample", data));
 		assertFalse(createReaderWithVisitors().read());
 		assertArrayEquals(data, store.get(123).getData());
@@ -265,17 +266,23 @@ public class ExecutionDataReaderWriterTest {
 
 	@Test(expected = RuntimeException.class)
 	public void testExecutionDataIOException() throws IOException {
-		final boolean[] broken = new boolean[1];
+		final BitSet[] broken = new BitSet[1];
 		final ExecutionDataWriter writer = createWriter(new OutputStream() {
 			@Override
 			public void write(int b) throws IOException {
-				if (broken[0]) {
+				if (broken[0] != null) {
 					throw new IOException();
 				}
 			}
 		});
-		broken[0] = true;
+		broken[0] = createBitSet(1);
 		writer.visitClassExecution(new ExecutionData(3, "Sample", createData(1)));
+	}
+
+	private BitSet createBitSet(int bitToSet) {
+		BitSet bs = new BitSet();
+		bs.set(bitToSet);
+		return bs;
 	}
 
 	private ExecutionDataReader createReaderWithVisitors() throws IOException {
@@ -289,16 +296,17 @@ public class ExecutionDataReaderWriterTest {
 		return reader;
 	}
 
-	private boolean[] createData(final int probeCount) {
-		final boolean[] data = new boolean[random.nextInt(probeCount + 1)];
+	private BitSet[] createData(final int probeCount) {
+		final BitSet[] data = new BitSet[random.nextInt(probeCount + 1)];
 		for (int j = 0; j < data.length; j++) {
-			data[j] = random.nextBoolean();
+			data[j] = new BitSet();
+			data[j].set(random.nextInt(50));
 		}
 		return data;
 	}
 
-	private void assertArrayEquals(final boolean[] expected,
-			final boolean[] actual) {
+	private void assertArrayEquals(final BitSet[] expected,
+			final BitSet[] actual) {
 		assertTrue(Arrays.equals(expected, actual));
 	}
 

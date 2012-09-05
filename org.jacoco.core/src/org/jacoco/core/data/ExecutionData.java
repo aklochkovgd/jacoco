@@ -14,10 +14,11 @@ package org.jacoco.core.data;
 import static java.lang.String.format;
 
 import java.util.Arrays;
+import java.util.BitSet;
 
 /**
  * Execution data for a single Java class. While instances are immutable care
- * has to be taken about the probe data array of type <code>boolean[]</code>
+ * has to be taken about the probe data array of type <code>BitSet[]</code>
  * which can be modified.
  */
 public final class ExecutionData {
@@ -26,7 +27,7 @@ public final class ExecutionData {
 
 	private final String name;
 
-	private final boolean[] data;
+	private final BitSet[] data;
 
 	/**
 	 * Creates a new {@link ExecutionData} object with the given probe data.
@@ -38,7 +39,7 @@ public final class ExecutionData {
 	 * @param data
 	 *            probe data
 	 */
-	public ExecutionData(final long id, final String name, final boolean[] data) {
+	public ExecutionData(final long id, final String name, final BitSet[] data) {
 		this.id = id;
 		this.name = name;
 		this.data = data;
@@ -58,7 +59,7 @@ public final class ExecutionData {
 	public ExecutionData(final long id, final String name, final int dataLength) {
 		this.id = id;
 		this.name = name;
-		this.data = new boolean[dataLength];
+		this.data = new BitSet[dataLength];
 	}
 
 	/**
@@ -86,7 +87,7 @@ public final class ExecutionData {
 	 * 
 	 * @return execution data
 	 */
-	public boolean[] getData() {
+	public BitSet[] getData() {
 		return data;
 	}
 
@@ -94,7 +95,7 @@ public final class ExecutionData {
 	 * Sets all probe data entries to <code>false</code>.
 	 */
 	public void reset() {
-		Arrays.fill(data, false);
+		Arrays.fill(data, null);
 	}
 
 	/**
@@ -108,10 +109,12 @@ public final class ExecutionData {
 	public void merge(final ExecutionData other) {
 		assertCompatibility(other.getId(), other.getName(),
 				other.getData().length);
-		final boolean[] otherData = other.getData();
+		final BitSet[] otherData = other.getData();
 		for (int i = 0; i < data.length; i++) {
-			if (otherData[i]) {
-				data[i] = true;
+			if (data[i] != null && otherData[i] != null) {
+				data[i].or(otherData[i]);
+			} else if (otherData[i] != null) {
+				data[i] = otherData[i];
 			}
 		}
 	}

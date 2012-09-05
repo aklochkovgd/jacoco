@@ -111,8 +111,8 @@ class ExecutionDataAccess {
 	 * Generates the code that calls the runtime data access through the JRE API
 	 * method {@link Object#equals(Object)}. The code pops a {@link Object}
 	 * instance from the stack and pushes the probe array of type
-	 * <code>boolean[]</code> on the operand stack. The generated code requires
-	 * a stack size of 6.
+	 * <code>BitSet[]</code> on the operand stack. The generated code requires a
+	 * stack size of 6.
 	 * 
 	 * @param classid
 	 * @param classname
