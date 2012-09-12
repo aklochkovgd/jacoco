@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.jacoco.examples;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -21,7 +24,9 @@ import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
 import org.jacoco.core.analysis.ICounter;
 import org.jacoco.core.data.ExecutionData;
+import org.jacoco.core.data.ExecutionDataReader;
 import org.jacoco.core.data.ExecutionDataStore;
+import org.jacoco.core.data.ExecutionDataWriter;
 import org.jacoco.core.data.ProbeData;
 import org.jacoco.core.data.ProbeDataStrategy;
 import org.jacoco.core.instr.Instrumenter;
@@ -56,9 +61,24 @@ public class SourceFilesToTestMapping {
 		this.instrumentedClass = loader.getTargetClass();
 	}
 
-	private void printReport() throws Exception {
-		final ExecutionDataStore executionData = new ExecutionDataStore();
-		runtime.collect(executionData, null, false);
+	private ExecutionDataStore loadExecutionData(final String executionDataFile)
+			throws IOException {
+		final FileInputStream fis = new FileInputStream(executionDataFile);
+		final ExecutionDataReader executionDataReader = new ExecutionDataReader(
+				fis);
+		final ExecutionDataStore executionDataStore = new ExecutionDataStore();
+		executionDataReader.setExecutionDataVisitor(executionDataStore);
+
+		while (executionDataReader.read()) {
+		}
+
+		fis.close();
+
+		return executionDataStore;
+	}
+
+	private void printReport(final String reportFileName) throws Exception {
+		final ExecutionDataStore executionData = loadExecutionData(reportFileName);
 
 		final CoverageBuilder coverageBuilder = new CoverageBuilder();
 		final Analyzer analyzer = new Analyzer(executionData, coverageBuilder);
@@ -105,9 +125,13 @@ public class SourceFilesToTestMapping {
 		c.instrumentClass(TestTarget2.class);
 		c.test2();
 
-		c.printReport();
-
+		final ExecutionDataWriter writer = new ExecutionDataWriter(
+				new FileOutputStream("source_to_test.exec"));
+		c.runtime.collect(writer, null, false);
 		c.runtime.shutdown();
+
+		c.printReport("source_to_test.exec");
+
 	}
 
 	@Test

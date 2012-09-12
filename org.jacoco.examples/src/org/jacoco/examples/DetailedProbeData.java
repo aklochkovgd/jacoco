@@ -60,6 +60,11 @@ public class DetailedProbeData extends BooleanProbeData {
 		return coveredBy;
 	}
 
+	@Override
+	protected boolean[] getData() {
+		return super.getData();
+	}
+
 	private static String findCurrentTestMethod() {
 		Method method = null;
 		for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {

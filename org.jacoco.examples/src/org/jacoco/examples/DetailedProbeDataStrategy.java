@@ -34,8 +34,12 @@ public class DetailedProbeDataStrategy extends
 	@Override
 	public void writeData(final CompactDataOutput out, final ProbeData data)
 			throws IOException {
-		// TODO Auto-generated method stub
-
+		final DetailedProbeData d = (DetailedProbeData) data;
+		out.writeBooleanArray(d.getData());
+		out.writeVarInt(d.getCoveredBy().size());
+		for (final String testMethod : d.getCoveredBy()) {
+			out.writeUTF(testMethod);
+		}
 	}
 
 }
