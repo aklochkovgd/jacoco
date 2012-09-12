@@ -87,6 +87,7 @@ public class ExecutionDataWriter implements ISessionInfoVisitor,
 
 	public void visitClassExecution(final ExecutionData data) {
 		try {
+			System.out.println("DDD writing exec data " + data.getName());
 			out.writeByte(BLOCK_EXECUTIONDATA);
 			out.writeLong(data.getId());
 			out.writeUTF(data.getName());

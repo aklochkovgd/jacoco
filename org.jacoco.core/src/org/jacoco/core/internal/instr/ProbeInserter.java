@@ -91,6 +91,8 @@ class ProbeInserter extends MethodAdapter implements IProbeInserter {
 
 		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
 				InstrSupport.PROBE_DATA_CLASS, "setCovered", "(I)V");
+
+		System.out.println("DDD inserted probe " + id);
 	}
 
 	private void checkLoad() {

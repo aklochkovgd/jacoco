@@ -9,7 +9,6 @@ package org.jacoco.core.data;
 
 import java.io.IOException;
 
-
 public abstract class ProbeDataStrategy<T extends ProbeData> {
 
 	public abstract Class<T> getProbeDataClass();
@@ -21,7 +20,8 @@ public abstract class ProbeDataStrategy<T extends ProbeData> {
 	public abstract void writeData(CompactDataOutput out, ProbeData data)
 			throws IOException;
 
-	private static final String DEFAULT_STRATEGY_CLASS = "org.jacoco.core.data.BooleanProbeDataStrategy";
+	private static final String DEFAULT_STRATEGY_CLASS = BooleanProbeDataStrategy.class
+			.getName();
 
 	public final static ProbeDataStrategy<? extends ProbeData> INSTANCE = createInstance();
 
@@ -29,11 +29,13 @@ public abstract class ProbeDataStrategy<T extends ProbeData> {
 	private static ProbeDataStrategy<? extends ProbeData> createInstance() {
 		final String strategyClass = System.getProperty(
 				"jacoco.probeDataStrategy", DEFAULT_STRATEGY_CLASS);
+		System.out.println("DDD Using probe strategy" + strategyClass);
 		Class clazz;
 		try {
 			clazz = Class.forName(strategyClass);
 			return (ProbeDataStrategy) clazz.newInstance();
 		} catch (final Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
