@@ -9,7 +9,6 @@ package org.jacoco.core.data;
  */
 import java.io.IOException;
 
-
 public class BooleanProbeDataStrategy extends
 		ProbeDataStrategy<BooleanProbeData> {
 
@@ -31,6 +30,6 @@ public class BooleanProbeDataStrategy extends
 	@Override
 	public void writeData(final CompactDataOutput out, final ProbeData data)
 			throws IOException {
-		out.writeBooleanArray(((BooleanProbeData) data).getData());
+		out.writeBooleanArray(data.getProbes());
 	}
 }

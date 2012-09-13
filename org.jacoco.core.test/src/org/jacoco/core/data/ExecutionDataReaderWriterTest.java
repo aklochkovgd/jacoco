@@ -274,7 +274,7 @@ public class ExecutionDataReaderWriterTest {
 				}
 			}
 		});
-		broken.getData()[0] = true;
+		broken.getProbes()[0] = true;
 		writer.visitClassExecution(new ExecutionData(3, "Sample", createData(1)));
 	}
 
@@ -298,8 +298,7 @@ public class ExecutionDataReaderWriterTest {
 	}
 
 	private void assertDataEquals(ProbeData d1, ProbeData d2) {
-		assertTrue(Arrays.equals(((BooleanProbeData) d1).getData(),
-				((BooleanProbeData) d2).getData()));
+		assertTrue(Arrays.equals(d1.getProbes(), d2.getProbes()));
 	}
 
 	protected ExecutionDataWriter createWriter(OutputStream out)
