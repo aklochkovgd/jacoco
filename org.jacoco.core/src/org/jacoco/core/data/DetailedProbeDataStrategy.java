@@ -1,11 +1,6 @@
-package org.jacoco.examples;
+package org.jacoco.core.data;
 
 import java.io.IOException;
-
-import org.jacoco.core.data.CompactDataInput;
-import org.jacoco.core.data.CompactDataOutput;
-import org.jacoco.core.data.ProbeData;
-import org.jacoco.core.data.ProbeDataStrategy;
 
 public class DetailedProbeDataStrategy extends
 		ProbeDataStrategy<DetailedProbeData> {
@@ -34,12 +29,11 @@ public class DetailedProbeDataStrategy extends
 	@Override
 	public void writeData(final CompactDataOutput out, final ProbeData data)
 			throws IOException {
+		out.writeBooleanArray(data.getProbes());
 		final DetailedProbeData d = (DetailedProbeData) data;
-		out.writeBooleanArray(d.getData());
 		out.writeVarInt(d.getCoveredBy().size());
 		for (final String testMethod : d.getCoveredBy()) {
 			out.writeUTF(testMethod);
 		}
 	}
-
 }

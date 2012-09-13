@@ -1,4 +1,4 @@
-package org.jacoco.examples;
+package org.jacoco.core.data;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jacoco.core.data.BooleanProbeData;
-import org.jacoco.core.data.ProbeData;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

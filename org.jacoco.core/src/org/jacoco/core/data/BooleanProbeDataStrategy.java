@@ -30,8 +30,6 @@ public class BooleanProbeDataStrategy extends
 	@Override
 	public void writeData(final CompactDataOutput out, final ProbeData data)
 			throws IOException {
-		final boolean[] d = ((BooleanProbeData) data).getData();
-		System.out.println("DDD writing " + d.length + " probes");
-		out.writeBooleanArray(d);
+		out.writeBooleanArray(data.getProbes());
 	}
 }

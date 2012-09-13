@@ -44,7 +44,7 @@ public class BooleanProbeData implements ProbeData {
 		return data.length;
 	}
 
-	protected boolean[] getData() {
+	public boolean[] getProbes() {
 		return data;
 	}
 

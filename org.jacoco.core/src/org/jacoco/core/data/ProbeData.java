@@ -21,4 +21,6 @@ public interface ProbeData {
 
 	void setCovered(int probeId);
 
+	boolean[] getProbes();
+
 }
