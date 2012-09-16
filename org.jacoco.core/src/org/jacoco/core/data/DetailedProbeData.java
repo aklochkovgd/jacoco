@@ -2,9 +2,14 @@ package org.jacoco.core.data;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -21,6 +26,12 @@ public class DetailedProbeData extends BooleanProbeData {
 
 	private static final Class[] TEST_ANNOTATIONS = { Test.class, Before.class,
 			BeforeClass.class, After.class, AfterClass.class };
+
+	private static final Pattern[] TEST_CLASSES = { Pattern.compile("Test.*"),
+			Pattern.compile(".*TestCase"), Pattern.compile(".*Test") };
+
+	private static final Map<String, Set<String>> testMethodsCache = new HashMap<String, Set<String>>();
+	private static final Set<String> nonTestMethodsCache = new HashSet<String>();
 
 	private final Set<String> coveredBy = new HashSet<String>();
 
@@ -58,44 +69,90 @@ public class DetailedProbeData extends BooleanProbeData {
 		return coveredBy;
 	}
 
-	@Override
-	protected boolean[] getData() {
-		return super.getData();
-	}
-
 	private static String findCurrentTestMethod() {
-		Method method = null;
+		final Map<String, StackTraceElement> cachedTestClasses = new HashMap<String, StackTraceElement>();
 		for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-			final Method m = getMethod(e);
-			if (m == null) {
+			final Set<String> cacheEntry = testMethodsCache.get(e
+					.getClassName());
+			if (cacheEntry != null) {
+				if (cacheEntry.contains(e.getMethodName())) {
+					return getMethodName(e.getClassName(), e.getMethodName());
+				} else {
+					cachedTestClasses.put(e.getClassName(), e);
+				}
+			}
+		}
+
+		for (final StackTraceElement e : cachedTestClasses.values()) {
+			final Set<String> cacheEntry = testMethodsCache.get(e
+					.getClassName());
+			if (isTestMethod(e)) {
+				cacheEntry.add(e.getMethodName());
+				return getMethodName(e.getClassName(), e.getMethodName());
+			}
+		}
+
+		for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+			if (cachedTestClasses.containsKey(e.getClassName())
+					|| !isTestClass(e.getClassName())) {
 				continue;
 			}
-			if (isTestMethod(m)) {
-				method = m;
-				// System.out.println("Test method:"
-				// + m.getDeclaringClass().getName() + "#" + m.getName());
-				break;
+
+			if (isTestMethod(e)) {
+				testMethodsCache.get(e.getClassName()).add(e.getMethodName());
+				return getMethodName(e.getClassName(), e.getMethodName());
 			}
 		}
 
-		if (method == null) {
-			return null;
-		}
-
-		return getMethodName(method);
+		return null;
 	}
 
-	private static String getMethodName(final Method method) {
-		return method.getDeclaringClass().getName() + "#" + method.getName();
-	}
-
-	private static boolean isTestMethod(final Method method) {
-		for (final Class annotationClass : TEST_ANNOTATIONS) {
-			if (method.isAnnotationPresent(annotationClass)) {
+	private static boolean isTestClass(final String className) {
+		for (final Pattern p : TEST_CLASSES) {
+			if (p.matcher(className).matches()) {
+				testMethodsCache.put(className, new HashSet<String>());
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private static String getMethodName(final String className,
+			final String methodName) {
+		return className + "#" + methodName;
+	}
+
+	private static boolean isTestMethod(final StackTraceElement e) {
+		final String methodName = getMethodName(e.getClassName(),
+				e.getMethodName());
+		if (nonTestMethodsCache.contains(methodName)) {
+			return false;
+		}
+
+		if (isJunit3TestMethod(e)) {
+			return true;
+		}
+
+		final Method m = getMethod(e);
+		if (m != null) {
+			for (final Class annotationClass : TEST_ANNOTATIONS) {
+				if (m.isAnnotationPresent(annotationClass)) {
+					return true;
+				}
+			}
+		}
+
+		nonTestMethodsCache.add(methodName);
+		return false;
+	}
+
+	private static boolean isJunit3TestMethod(final StackTraceElement e) {
+		try {
+			final Class clazz = Class.forName(e.getClassName());
+			return TestCase.class.isAssignableFrom(clazz);
+		} catch (final ClassNotFoundException e1) {
+			return false;
+		}
 	}
 
 	private static Method getMethod(final StackTraceElement stackTraceElement) {

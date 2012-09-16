@@ -39,7 +39,7 @@ public abstract class ProbeDataStrategy<T extends ProbeData> {
 			strategy = DEFAULT_STRATEGY;
 		}
 		final Class strategyClass = STRATEGIES.get(strategy);
-		System.out.println("DDD Using strategy " + strategyClass.getName());
+		System.out.println("Using strategy " + strategyClass.getName());
 		try {
 			return (ProbeDataStrategy) strategyClass.newInstance();
 		} catch (final Exception e) {

@@ -49,7 +49,6 @@ public class BooleanProbeData implements ProbeData {
 	}
 
 	public void setCovered(final int probeId) {
-		System.out.println("DDD covering probe " + probeId);
 		data[probeId] = true;
 	}
 

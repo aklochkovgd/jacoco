@@ -79,22 +79,18 @@ public class CoverageTransformer implements ClassFileTransformer {
 			final byte[] classfileBuffer) throws IllegalClassFormatException {
 
 		if (!filter(loader, classname)) {
-			System.out.println("DDD Not instrumenting " + classname);
 			return null;
 		}
 
 		try {
 			classFileDumper.dump(classname, classfileBuffer);
-			System.out.println("DDD dumped " + classname);
 			if (classBeingRedefined != null) {
 				// For redefined classes we must clear the execution data
 				// reference as probes might have changed.
 				runtime.disconnect(classBeingRedefined);
 			}
-			System.out.println("DDD instrumenting " + classname);
 			return instrumenter.instrument(classfileBuffer);
 		} catch (final Throwable ex) {
-			System.out.println("DDD error instrumenting " + classname);
 			ex.printStackTrace();
 			final IllegalClassFormatException wrapper = new IllegalClassFormatException(
 					format("Error while instrumenting class %s.", classname));
